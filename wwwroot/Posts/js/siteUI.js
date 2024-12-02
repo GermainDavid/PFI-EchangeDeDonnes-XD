@@ -154,6 +154,10 @@ function showDeletePostForm(id) {
     $("#viewTitle").text("Retrait");
     renderDeletePostForm(id);
 }
+function showLogin() {
+    showForm();
+    renderLoginForm();
+}
 function showAbout() {
     hidePosts();
     $("#hiddenIcon").show();
@@ -180,7 +184,7 @@ function start_Periodic_Refresh() {
             // the etag contain the number of model records in the following form
             // xxx-etag
             let postsCount = parseInt(etag.split("-")[0]);
-            if (currentETag != etag) {           
+            if (currentETag != etag) {
                 if (postsCount != currentPostsCount) {
                     console.log("postsCount", postsCount)
                     currentPostsCount = postsCount;
@@ -272,6 +276,14 @@ function updateDropDownMenu() {
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
     DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="loginCmd">
+            <i class="menuIcon fa fa-right-to-bracket mx-2"></i> Se Connecter
+        </div>
+    `));
+    DDMenu.append($(`
+            <div class="dropdown-divider"></div>
+        `));
+    DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="allCatCmd">
             <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
         </div>
@@ -293,6 +305,9 @@ function updateDropDownMenu() {
         `));
     $('#aboutCmd').on("click", function () {
         showAbout();
+    });
+    $('#loginCmd').on("click", function () {
+        showLogin();
     });
     $('#allCatCmd').on("click", async function () {
         selectedCategory = "";
@@ -539,6 +554,77 @@ function renderPostForm(post = null) {
     });
     $('#cancel').on("click", async function () {
         await showPosts();
+    });
+}
+function renderLoginForm() {
+    $("#viewTitle").text("Connexion");
+    $("#form").show();
+    $("#form").empty();
+    $("#form").append($(`
+        <form class="loginForm">
+            <div class="form-section">
+                <input type="text" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
+                <input type="text" id="Password" placeholder="Mot de Passe" name="Password" required RequireMessage="Veuillez entrer le mot de passe" class="textInput"/>
+            </div>
+            <div class="form-submit-section">
+                <input type="submit" value="Entrer" id="commit" class="btn btn-primary"/>
+                <hr/>
+                <input type="submit"value="Nouveau Compte" id="createAccount" class="btn btn-secondary newAccountBtn"/>
+            </div>
+        </form>
+    `));
+    initFormValidation(); // important do to after all html injection!
+    $('#createAccount').on("click", function () {
+        renderCreateAccountForm();
+    });
+    $('#commit').on("click", function(){
+        console.log("Login") //Faire Procédure de Login Içi !!!
+    });
+}
+function renderCreateAccountForm() {
+    $("#viewTitle").text("Créer un Compte");
+    $("#form").show();
+    $("#form").empty();
+    $("#form").append($(`
+        <form class="createAccountForm">
+            <div class="form-section">
+                <span>Adresse Courriel</span>
+                <input type="text" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
+                <input type="text" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
+            </div>
+            <div class="form-section">
+                <span>Mot de Passe</span>
+                <input type="text" id="Password" placeholder="Mot de passe" name="Password" required RequireMessage="Veuillez entrer un mot de passe" class="textInput"/>
+                <input type="text" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
+            </div>
+            <div class="form-section">
+                <span>Nom</span>
+                <input type="text" id="Username" placeholder="Nom" name="Username" required RequireMessage="Veuillez entrer un nom" class="textInput"/>
+            </div>
+            <div class="form-section">
+                <span>Avatar</span>
+                <div class='imageUploaderContainer'>
+                    <div class='imageUploader form-section-image' 
+                            newImage='./no-avatar.png' 
+                            controlId='Image' 
+                            imageSrc='./no-avatar.png' 
+                            waitingImage="Loading_icon.gif">
+                    </div>
+                </div>
+            </div>
+            <div class="form-submit-section">
+                <input type="submit" value="Enregistrer" id="commit" class="btn btn-primary"/>
+                <input type="submit"value="Annuler" id="cancel" class="btn btn-secondary"/>
+            </div>
+        </form>
+    `));
+    initImageUploaders();
+    initFormValidation(); // important do to after all html injection!
+    $('#cancel').on("click", function () {
+        renderLoginForm();
+    });
+    $('#commit').on("click", function(){
+        console.log("Création de Compte") //Faire Procédure de Création de Compte Içi !!!
     });
 }
 function getFormData($form) {
