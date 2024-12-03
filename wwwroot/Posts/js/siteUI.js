@@ -578,6 +578,7 @@ function renderLoginForm() {
         renderCreateAccountForm();
     });
     $('#commit').on("click", function(){
+        let loginInfo = getFormData($(".loginForm"));
         console.log("Login") //Faire Procédure de Login Içi !!!
     });
 }
