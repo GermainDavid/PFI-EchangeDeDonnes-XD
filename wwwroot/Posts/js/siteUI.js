@@ -629,7 +629,7 @@ function renderCreateAccountForm() {
                 </div>
             </div>
             <div class="form-submit-section">
-                <input type="submit" value="Enregistrer" id="commit" class="btn btn-primary"/>
+                <input type="submit" value="Enregistrer" id="commitUser" class="btn btn-primary"/>
                 <input type="submit"value="Annuler" id="cancel" class="btn btn-secondary"/>
             </div>
         </form>
@@ -639,9 +639,26 @@ function renderCreateAccountForm() {
     $('#cancel').on("click", function () {
         renderLoginForm();
     });
-    $('#commit').on("click", function () {
-        
-        console.log("Création de Compte") //Faire Procédure de Création de Compte Içi !!!
+    $('#commitUser').on("click", function () {
+        console.log("Création de Compte"); //Faire Procédure de Création de Compte Içi !!!
+        let name = $("#Username").val();
+        let password = $("#Password").val();
+        let email = $("#Email").val();
+        console.log(name +" " + password +" "+ email);
+        let post = getFormData($(".createAccountForm"));
+        let userObject = {
+            Id: 0,
+            Name: name,
+            Password: password,
+            Email: email,
+            Avatar: post.Image
+        };
+        //await Users_API.Save(userObject);
+        let a = users_API.Register(userObject);
+        //console.log(a);
+        //users_API.Save(userObject);
+        console.log("Création de Compte"); //Faire Procédure de Création de Compte Içi !!!
+        renderLoginForm();
     });
 }
 function getFormData($form) {
