@@ -230,17 +230,32 @@ async function renderPosts(queryString) {
 }
 function renderPost(post, loggedUser) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
-    let crudIcon =
+    let crudIcon;
+    let LikeIcon;
+    if(loggedUser != undefined)
+    {
+        
+    }
+    crudIcon =
         `
         <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
         <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
         `;
-
+    if(loggedUser != undefined)
+    {
+        
+    }
+    LikeIcon =
+        `
+        <p class="fa-regular fa-thumbs-up"></p>
+        <p>0</p>
+        `;
     return $(`
         <div class="post" id="${post.Id}">
             <div class="postHeader">
                 ${post.Category}
                 ${crudIcon}
+                ${LikeIcon}
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
@@ -624,7 +639,8 @@ function renderCreateAccountForm() {
     $('#cancel').on("click", function () {
         renderLoginForm();
     });
-    $('#commit').on("click", function(){
+    $('#commit').on("click", function () {
+        
         console.log("Création de Compte") //Faire Procédure de Création de Compte Içi !!!
     });
 }
