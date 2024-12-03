@@ -79,5 +79,31 @@
         },
         "VerifyCode": "verified",
         "Id": "f11ee960-aa82-11ef-b942-e7f097a2ee7a"
+    },
+    {
+        "Id": "3a66daa0-b1b9-11ef-a298-73c9afdd0ff5",
+        "Name": "Xavier D.",
+        "Password": "password",
+        "Email": "xavier_dubreuil@hotmail.com",
+        "Avatar": "3a66daa1-b1b9-11ef-a298-73c9afdd0ff5.jpeg",
+        "Created": 1733277458,
+        "VerifyCode": 659681,
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
+    },
+    {
+        "Id": "bf8d4f70-b1b9-11ef-9fe6-cd2535cb4d7e",
+        "Name": "Xavier Dubreuil",
+        "Password": "password",
+        "Email": "xavier48484848@outlook.com",
+        "Avatar": "bf8d4f71-b1b9-11ef-9fe6-cd2535cb4d7e.png",
+        "Created": 1733277681,
+        "VerifyCode": 262273,
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
     }
 ]
