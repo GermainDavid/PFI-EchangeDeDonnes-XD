@@ -599,19 +599,20 @@ function renderLoginForm() {
 }
 function renderCreateAccountForm() {
     $("#viewTitle").text("Créer un Compte");
-    $("#form").show();
-    $("#form").empty();
-    $("#form").append($(`
+    $("#form").show().empty();
+
+    // Ajout du formulaire HTML
+    $("#form").append($(` 
         <form class="createAccountForm">
             <div class="form-section">
                 <span>Adresse Courriel</span>
-                <input type="text" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
-                <input type="text" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
+                <input type="text" class="Email" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
+                <input type="text" class="Email MatchedInput" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required matchedInputId="Email" RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Mot de Passe</span>
-                <input type="text" id="Password" placeholder="Mot de passe" name="Password" required RequireMessage="Veuillez entrer un mot de passe" class="textInput"/>
-                <input type="text" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
+                <input type="password" id="Password" placeholder="Mot de passe" name="Password" required RequireMessage="Veuillez entrer un mot de passe" class="textInput"/>
+                <input type="password" class="MatchedInput" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required matchedInputId="Password" RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Nom</span>
@@ -630,21 +631,43 @@ function renderCreateAccountForm() {
             </div>
             <div class="form-submit-section">
                 <input type="submit" value="Enregistrer" id="commitUser" class="btn btn-primary"/>
-                <input type="submit"value="Annuler" id="cancel" class="btn btn-secondary"/>
+                <input type="button" value="Annuler" id="cancel" class="btn btn-secondary"/>
             </div>
         </form>
     `));
-    initImageUploaders();
-    initFormValidation(); // important do to after all html injection!
+
+    // Initialisation des fonctionnalités
+    initFormValidation(); // Validation regex et comportement
+    //addConflictValidation('/api/check-email', 'Email', 'commitUser'); // Validation d'unicité des emails
+    initImageUploaders(); // Gestion de l'upload d'avatar
+
+    // Gestion du bouton "Annuler"
     $('#cancel').on("click", function () {
         renderLoginForm();
     });
-    $('#commitUser').on("click", function () {
-        console.log("Création de Compte"); //Faire Procédure de Création de Compte Içi !!!
-        let name = $("#Username").val();
+
+    // Gestion du bouton "Enregistrer"
+    $('#commitUser').on("click", async function (e) {
+        e.preventDefault(); // Empêche le rechargement de la page
+
+        // Validation des champs (mot de passe et e-mail)
         let password = $("#Password").val();
+        let passwordVerification = $("#PasswordVerification").val();
         let email = $("#Email").val();
-        console.log(name +" " + password +" "+ email);
+        let emailVerification = $("#EmailVerification").val();
+        console.log(password);
+        console.log(passwordVerification);
+        if (password !== passwordVerification) {
+            alert("Les mots de passe ne correspondent pas.");
+            return;
+        }
+        if (email !== emailVerification) {
+            alert("Les courriels ne correspondent pas.");
+            return;
+        }
+
+        // Récupération des données du formulaire
+        let name = $("#Username").val();
         let post = getFormData($(".createAccountForm"));
         let userObject = {
             Id: 0,
@@ -653,12 +676,20 @@ function renderCreateAccountForm() {
             Email: email,
             Avatar: post.Image
         };
-        //await Users_API.Save(userObject);
-        let a = users_API.Register(userObject);
-        //console.log(a);
-        //users_API.Save(userObject);
-        console.log("Création de Compte"); //Faire Procédure de Création de Compte Içi !!!
-        renderLoginForm();
+        console.log(name);
+        if(name == undefined || name == null || name == " " || name == "")
+        {
+            alert("nom obligatoire");
+            return;
+        }
+            let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
+            if (response != null ) {
+                alert("Compte créé avec succès !");
+                renderLoginForm(); // Redirection vers le formulaire de connexion
+            }
+            else{
+                alert("Une erreur est survenue lors de la création du compte.");
+            }
     });
 }
 function getFormData($form) {
