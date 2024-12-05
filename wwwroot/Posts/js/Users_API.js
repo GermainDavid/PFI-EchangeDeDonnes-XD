@@ -31,7 +31,7 @@ class users_API {
         users_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: this.API_URL() + (id != null ? "/" + id : ""),
+                url: this.Host_URL() + "/api/accounts/" + (id != null ? "/" + id : ""),
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
             });

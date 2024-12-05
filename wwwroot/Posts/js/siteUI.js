@@ -158,6 +158,10 @@ function showLogin() {
     showForm();
     renderLoginForm();
 }
+function showUserManager(){
+    showForm();
+    renderUserManager();
+}
 function showAbout() {
     hidePosts();
     $("#hiddenIcon").show();
@@ -291,6 +295,14 @@ function updateDropDownMenu() {
     let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
     DDMenu.empty();
     DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="userManagerCmd">
+            <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion d'usagers
+        </div>
+    `));
+    DDMenu.append($(`
+        <div class="dropdown-divider"></div>
+    `));
+    DDMenu.append($(`
         <div class="dropdown-item menuItemLayout" id="loginCmd">
             <i class="menuIcon fa fa-right-to-bracket mx-2"></i> Se Connecter
         </div>
@@ -320,6 +332,9 @@ function updateDropDownMenu() {
         `));
     $('#aboutCmd').on("click", function () {
         showAbout();
+    });
+    $('#userManagerCmd').on("click", function () {
+        showUserManager();
     });
     $('#loginCmd').on("click", function () {
         showLogin();
@@ -691,6 +706,25 @@ function renderCreateAccountForm() {
                 alert("Une erreur est survenue lors de la création du compte.");
             }
     });
+}
+async function renderUserManager() {
+    $("#viewTitle").text("Gestion d'usagers");
+    $("#form").show();
+    $("#form").empty();
+    let users = await users_API.Get();
+    console.log(users);
+    //Peuplement de la page
+    $("#form").append($(` 
+        <div class="userManagerContainer">
+            <div class="userManagerRow">
+                <img src="Nicolas-Chourot.jpeg" />
+                <span>Nicolas Chourot</span>
+                <i class="fa-solid fa-user"></i>
+                <i class="fa-solid fa-ban"></i>
+                <i class="fa-solid fa-trash"></i>
+            </div>
+        </div>
+    `));
 }
 function getFormData($form) {
     // prevent html injections

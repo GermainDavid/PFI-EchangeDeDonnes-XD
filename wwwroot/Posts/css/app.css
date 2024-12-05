@@ -318,3 +318,31 @@ label {
     background-color: #17c291;
     border: none;
 }
+/*-----------------------------------------User Manager Related-----------------------------------------*/
+.userManagerContainer{
+    display: flex;
+    flex-direction: column;
+}
+.userManagerRow{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 50px;
+    width: 100%;
+}
+.userManagerRow > img{
+    border-radius: 50%;
+    width: auto;
+    height: 100%;
+}
+.userManagerRow > span{
+    font-family: var(--roboto);
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-right: auto;
+    margin-left: 10px;
+}
+.userManagerRow > i{
+    font-size: 40px;
+    margin-left: 10px;
+}
