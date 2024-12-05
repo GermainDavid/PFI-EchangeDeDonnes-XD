@@ -711,20 +711,44 @@ async function renderUserManager() {
     $("#viewTitle").text("Gestion d'usagers");
     $("#form").show();
     $("#form").empty();
+    //Html et User
     let users = await users_API.Get();
     console.log(users);
-    //Peuplement de la page
-    $("#form").append($(` 
-        <div class="userManagerContainer">
+    let usersHtml = "";
+    users.data.forEach(user => {
+        let autorization = "userCmd fa-solid fa-user";
+        if(user.isAdmin){
+            autorization = "adminCmd fa-solid fa-user-tie"
+        }
+        else if(user.isSuper){
+            autorization = "superCmd fa-solid fa-user-gear"
+        }
+        usersHtml += `
             <div class="userManagerRow">
-                <img src="Nicolas-Chourot.jpeg" />
-                <span>Nicolas Chourot</span>
-                <i class="fa-solid fa-user"></i>
+                <img src="${user.Avatar}" />
+                <span>${user.Name}</span>
+                <i class="${autorization}" id="${user.Id}"></i>
                 <i class="fa-solid fa-ban"></i>
                 <i class="fa-solid fa-trash"></i>
             </div>
+        `;
+    })
+    //Peuplement de la page
+    $("#form").append($(` 
+        <div class="userManagerContainer">
+            ${usersHtml}
         </div>
     `));
+    //Boutons
+    $('.userCmd').on("click", async function(){
+        let id = $(this).attr('id');
+        await users_API.Promote(id);
+        renderUserManager();
+    });
+    $('.superUserCmd').on("click", function(){
+    });
+    $('.adminCmd').on("click", function(){
+    });
 }
 function getFormData($form) {
     // prevent html injections
