@@ -132,5 +132,18 @@
             "readAccess": 1,
             "writeAccess": 1
         }
+    },
+    {
+        "Id": "55f34cf0-b401-11ef-950b-ed92cc8e2014",
+        "Name": "test",
+        "Password": "test",
+        "Email": "test@hotmail.com",
+        "Avatar": "55f34cf1-b401-11ef-950b-ed92cc8e2014.png",
+        "Created": 1733528330,
+        "VerifyCode": 373770,
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
     }
 ]

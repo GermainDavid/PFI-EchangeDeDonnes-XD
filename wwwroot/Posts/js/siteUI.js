@@ -158,7 +158,11 @@ function showLogin() {
     showForm();
     renderLoginForm();
 }
-function showUserManager(){
+function showConfirmLogin() {
+    showForm();
+    renderLoginConfirm();
+}
+function showUserManager() {
     showForm();
     renderUserManager();
 }
@@ -236,18 +240,16 @@ function renderPost(post, loggedUser) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
     let crudIcon;
     let LikeIcon;
-    if(loggedUser != undefined)
-    {
-        
+    if (loggedUser != undefined) {
+
     }
     crudIcon =
         `
         <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
         <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
         `;
-    if(loggedUser != undefined)
-    {
-        
+    if (loggedUser != undefined) {
+
     }
     LikeIcon =
         `
@@ -607,14 +609,58 @@ function renderLoginForm() {
     $('#createAccount').on("click", function () {
         renderCreateAccountForm();
     });
-    $('#commitLogin').on("click", async function(){
-        let loginInfo = getFormData($(".loginForm")); 
+    $('#commitLogin').on("click", async function () {
+        let loginInfo = getFormData($(".loginForm"));
         console.log(loginInfo);
+        
         let user = await users_API.Login(loginInfo);
-        console.log(user);
+
+        showConfirmLogin();
+        /*
+        if(user.User.VerifyCode != "verified")
+        {
+            
+        }
+        else
+        {
+            //let user = await users_API.Login(loginInfo);
+        }
+            */
         //await users_API.Logout(user.User.Id);
+        //renderLoginConfirm();
+        /*
+        console.log(user);
+        if(user != null)
+        {
+            //sessionStorage.setItem("userId", user.User.Id);
+            sessionStorage.setItem("Email",loginInfo.Email);
+            sessionStorage.setItem("Password",loginInfo.Password);
+        }
+        
         console.log("Login") //Faire Procédure de Login Içi !!!
+        */
     });
+}
+function renderLoginConfirm() {
+    //let user = await users_API.Login(loginInfo);
+        $("#viewTitle").text("Confirmation de compte");
+        $("#form").show();
+        $("#form").empty();
+        $("#form").append($(`
+        <form class="ConfirmationForm">
+            <div class="form-section">
+                <input type="text" id="Code" placeholder="Code de confirmation" name="Code" required RequireMessage="Veuillez entrer le code de confirmation" class="textInput"/>
+            </div>
+            <div class="form-submit-section">
+                <input type="submit" value="Confirmation" id="confirmeLogin" class="btn btn-primary"/>
+            </div>
+        </form>
+        `));
+        $('#confirmeLogin').on("click", function () {
+            //let code = getFormData($(".ConfirmationForm"));
+            //let test = sessionStorage.getItem("userId");
+            //console.log(test);
+        });
 }
 function renderCreateAccountForm() {
     $("#viewTitle").text("Créer un Compte");
@@ -696,19 +742,18 @@ function renderCreateAccountForm() {
             Avatar: post.Image
         };
         console.log(name);
-        if(name == undefined || name == null || name == " " || name == "")
-        {
+        if (name == undefined || name == null || name == " " || name == "") {
             alert("nom obligatoire");
             return;
         }
-            let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
-            if (response != null ) {
-                alert("Compte créé avec succès !");
-                renderLoginForm(); // Redirection vers le formulaire de connexion
-            }
-            else{
-                alert("Une erreur est survenue lors de la création du compte.");
-            }
+        let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
+        if (response != null) {
+            alert("Compte créé avec succès !");
+            renderLoginForm(); // Redirection vers le formulaire de connexion
+        }
+        else {
+            alert("Une erreur est survenue lors de la création du compte.");
+        }
     });
 }
 async function renderUserManager() {
@@ -721,10 +766,10 @@ async function renderUserManager() {
     let usersHtml = "";
     users.data.forEach(user => {
         let autorization = "userCmd fa-solid fa-user";
-        if(user.isAdmin){
+        if (user.isAdmin) {
             autorization = "adminCmd fa-solid fa-user-tie"
         }
-        else if(user.isSuper){
+        else if (user.isSuper) {
             autorization = "superCmd fa-solid fa-user-gear"
         }
         usersHtml += `
@@ -744,14 +789,14 @@ async function renderUserManager() {
         </div>
     `));
     //Boutons
-    $('.userCmd').on("click", async function(){
+    $('.userCmd').on("click", async function () {
         let id = $(this).attr('id');
         await users_API.Promote(id);
         renderUserManager();
     });
-    $('.superUserCmd').on("click", function(){
+    $('.superUserCmd').on("click", function () {
     });
-    $('.adminCmd').on("click", function(){
+    $('.adminCmd').on("click", function () {
     });
 }
 function getFormData($form) {

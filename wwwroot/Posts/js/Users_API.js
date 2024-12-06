@@ -78,6 +78,19 @@ class users_API {
             });
         });
     }*/
+    static async ConfirmationUser(id,code) {
+        users_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/accounts/verify?id="+id+"&code="+code,
+                type: "GET",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
     static async Login(data) {
         users_API.initHttpState();
         return new Promise(resolve => {
