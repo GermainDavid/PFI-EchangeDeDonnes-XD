@@ -597,7 +597,7 @@ function renderLoginForm() {
                 <input type="text" id="Password" placeholder="Mot de Passe" name="Password" required RequireMessage="Veuillez entrer le mot de passe" class="textInput"/>
             </div>
             <div class="form-submit-section">
-                <input type="submit" value="Entrer" id="commit" class="btn btn-primary"/>
+                <input type="submit" value="Entrer" id="commitLogin" class="btn btn-primary"/>
                 <hr/>
                 <input type="submit"value="Nouveau Compte" id="createAccount" class="btn btn-secondary newAccountBtn"/>
             </div>
@@ -607,8 +607,12 @@ function renderLoginForm() {
     $('#createAccount').on("click", function () {
         renderCreateAccountForm();
     });
-    $('#commit').on("click", function(){
-        let loginInfo = getFormData($(".loginForm"));
+    $('#commitLogin').on("click", async function(){
+        let loginInfo = getFormData($(".loginForm")); 
+        console.log(loginInfo);
+        let user = await users_API.Login(loginInfo);
+        console.log(user);
+        //await users_API.Logout(user.User.Id);
         console.log("Login") //Faire Procédure de Login Içi !!!
     });
 }
