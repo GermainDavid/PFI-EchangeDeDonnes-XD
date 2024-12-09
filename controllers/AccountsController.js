@@ -155,8 +155,8 @@ export default class AccountsController extends Controller {
     block(user) {
         if (this.repository != null) {
             let foundUser = this.repository.findByField("Id", user.Id);
-            foundUser.Authorizations.readAccess = foundUser.Authorizations.readAccess == 1 ? -1 : 1;
-            foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess == 1 ? -1 : 1;
+            foundUser.Authorizations.readAccess = foundUser.Authorizations.readAccess >= 1 ? -1 : 1;
+            foundUser.Authorizations.writeAccess = foundUser.Authorizations.writeAccess >= 1 ? -1 : 1;
             this.repository.update(user.Id, foundUser, false);
             if (this.repository.model.state.isValid) {
                 userFound = this.repository.get(userFound.Id); // get data binded record
@@ -209,8 +209,16 @@ export default class AccountsController extends Controller {
     // GET:account/remove/id
     remove(id) { // warning! this is not an API endpoint 
         // todo make sure that the requester has legitimity to delete ethier itself or its an admin
-        if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext.authorizations, this.requiredAuthorizations, id)) {
-            // todo
-        }
+        //if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext.authorizations, this.requiredAuthorizations, id)) {
+            if (AccessControl.readGranted(this.HttpContext.authorizations, AccessControl.anonymous())){
+            if (this.HttpContext.path.id !== '') {
+                if (this.repository.remove(id))
+                    this.HttpContext.response.accepted();
+                else
+                    this.HttpContext.response.notFound("Ressource not found.");
+            } else
+                this.HttpContext.response.badRequest("The Id in the request url is  not specified.");
+        } else
+            this.HttpContext.response.unAuthorized("Unauthorized access");       
     }
 }

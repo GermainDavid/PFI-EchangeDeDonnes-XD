@@ -758,6 +758,7 @@ function renderCreateAccountForm() {
 }
 async function renderUserManager() {
     $("#viewTitle").text("Gestion d'usagers");
+    $("#commit").hide();
     $("#form").show();
     $("#form").empty();
     //Html et User
@@ -765,20 +766,26 @@ async function renderUserManager() {
     console.log(users);
     let usersHtml = "";
     users.data.forEach(user => {
-        let autorization = "userCmd fa-solid fa-user";
+        //Niveau d'autorisations
+        let autorization = "promoteCmd fa-solid fa-user";
         if (user.isAdmin) {
-            autorization = "adminCmd fa-solid fa-user-tie"
+            autorization = "promoteCmd fa-solid fa-user-tie"
         }
         else if (user.isSuper) {
-            autorization = "superCmd fa-solid fa-user-gear"
+            autorization = "promoteCmd fa-solid fa-user-gear"
+        }
+        //Bloqué ?
+        let blocked = "";
+        if(user.isBlocked){
+            blocked = "color : red";
         }
         usersHtml += `
-            <div class="userManagerRow">
+            <div class="userManagerRow" userId="${user.Id}">
                 <img src="${user.Avatar}" />
                 <span>${user.Name}</span>
-                <i class="${autorization}" id="${user.Id}"></i>
-                <i class="fa-solid fa-ban"></i>
-                <i class="fa-solid fa-trash"></i>
+                <i class="${autorization}"></i>
+                <i class="blockCmd fa-solid fa-ban" style="${blocked}"></i>
+                <i class="eraseCmd fa-solid fa-trash"></i>
             </div>
         `;
     })
@@ -789,14 +796,47 @@ async function renderUserManager() {
         </div>
     `));
     //Boutons
-    $('.userCmd').on("click", async function () {
-        let id = $(this).attr('id');
-        await users_API.Promote(id);
+    $('.promoteCmd').on("click", async function () {
+        let id = $(this).parent().attr('userId');
+        let user = await users_API.Get(id);
+        await users_API.Promote(user.data);
         renderUserManager();
     });
-    $('.superUserCmd').on("click", function () {
+    $('.blockCmd').on("click", async function () {
+        let id = $(this).parent().attr('userId');
+        let user = await users_API.Get(id);
+        await users_API.Block(user.data);
+        renderUserManager();
     });
-    $('.adminCmd').on("click", function () {
+    $('.eraseCmd').on("click", async function () {
+        let id = $(this).parent().attr('userId');
+        renderConfirmationDelete(id);
+    });
+}
+async function renderConfirmationDelete(id) {
+    let user = await users_API.Get(id);
+    console.log(user);
+    $("#form").empty();
+    $("#form").append($(` 
+        <form class="deleteForm">
+            <h2>Voulez-vous vraiment supprimer cet usager ?</h2>
+            <div class="userManagerRow inDelete">
+                <img src="${user.data.Avatar}" />
+                <span>${user.data.Name}</span>
+            </div>
+            <div class="form-submit-section">
+                <input type="submit" value="Oui" id="deleteCmd" class="btn btn-primary deleteBtn"/>
+                <hr/>
+                <input type="submit"value="Non" id="cancelCmd" class="btn btn-secondary"/>
+            </div>
+        </form>
+    `));
+    $('#deleteCmd').on("click", async function () {
+        await users_API.Remove(id);
+        renderUserManager();
+    });
+    $('#cancelCmd').on("click", async function () {
+        renderUserManager();
     });
 }
 function getFormData($form) {

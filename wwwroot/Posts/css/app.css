@@ -342,9 +342,34 @@ label {
     font-weight: bold;
     margin-right: auto;
     margin-left: 10px;
+    width: max-content;
 }
 .userManagerRow > i{
-    font-size: 40px;
-    margin-left: 10px;
-    width: 50px;
+    font-size: 30px;
+    margin-left: 15px;
+    width: 30px;
+}
+.deleteForm{
+    margin: 30px;
+}
+.deleteForm > h2{
+    margin-bottom: 20px;
+}
+.inDelete{
+    height: 150px;
+}
+.inDelete > img{
+    width: 150px;
+}
+.inDelete > span{
+    margin-left: 20px;
+    font-size: 1.5em;
+}
+.deleteBtn{
+    background-color: crimson;
+    border-color: crimson;
+}
+.deleteBtn:hover{
+    background-color: rgb(155, 5, 35);
+    border-color: rgb(155, 5, 35);
 }

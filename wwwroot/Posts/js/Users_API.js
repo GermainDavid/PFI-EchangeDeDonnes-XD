@@ -28,6 +28,7 @@ class users_API {
         });
     }
     static async Get(id = null) {
+        console.log(id);
         users_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
@@ -37,12 +38,25 @@ class users_API {
             });
         });
     }
-    static async Promote(id){
+    static async Promote(data){
         users_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
-                url: this.Host_URL() + "/accounts/promote?id" + id ,
-                type: "PUT",
+                url: this.Host_URL() + "/accounts/promote" ,
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async Block(data){
+        users_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/accounts/block" ,
+                type: "POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: (data) => { resolve(data); },
@@ -129,11 +143,11 @@ class users_API {
             });
         });
     }
-    static async Delete(id) {
+    static async Remove(id) {
         return new Promise(resolve => {
             $.ajax({
-                url: this.API_URL() + "/" + id,
-                type: "DELETE",
+                url: this.Host_URL() + "/accounts/remove/" + id,
+                type: "GET",
                 complete: () => {
                     users_API.initHttpState();
                     resolve(true);
