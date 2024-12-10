@@ -689,7 +689,7 @@ function renderLoginConfirm() {
             }
             else
             {
-                $("#errorMessage").text("Le code et le courriel ne corresponde pas!").show();
+                $("#errorMessage").text(users_API.currentHttpError).show();
             }
         });
 }
@@ -729,6 +729,7 @@ function renderCreateAccountForm() {
                 <input type="submit" value="Enregistrer" id="commitUser" class="btn btn-primary"/>
                 <input type="button" value="Annuler" id="cancel" class="btn btn-secondary"/>
             </div>
+            <p id="errorMessage" style="color: red; display: none;"></p>
         </form>
     `));
 
@@ -772,9 +773,13 @@ function renderCreateAccountForm() {
             Email: email,
             Avatar: post.Image
         };
-        console.log(name);
         if (name == undefined || name == null || name == " " || name == "") {
-            alert("nom obligatoire");
+            $("#errorMessage").text("Nom obligatoire").show();
+            return;
+        }
+        if(post.Image == undefined || post.Image == null || post.Image == " " || post.Image == " ")
+        {
+            $("#errorMessage").text("Photo de profil obligatoire").show();
             return;
         }
         let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
@@ -783,7 +788,7 @@ function renderCreateAccountForm() {
             renderLoginForm(); // Redirection vers le formulaire de connexion
         }
         else {
-            alert("Une erreur est survenue lors de la création du compte.");
+            $("#errorMessage").text(users_API.currentHttpError).show();
         }
     });
 }
