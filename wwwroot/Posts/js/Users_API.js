@@ -64,6 +64,44 @@ class users_API {
             });
         });
     }
+    static async Like(data){
+        users_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/api/likes" ,
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async getAllLike()
+    {
+        users_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/api/likes",
+                type: "GET",
+                contentType: 'text/plain',
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async Unlike(id){
+        users_API.initHttpState();
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/api/likes/"+id,
+                type: "DELETE",
+                contentType: 'text/plain',
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
     static async GetQuery(queryString = "") {
         users_API.initHttpState();
         return new Promise(resolve => {

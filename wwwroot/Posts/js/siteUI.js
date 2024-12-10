@@ -238,24 +238,25 @@ async function renderPosts(queryString) {
 }
 function renderPost(post, loggedUser) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
-    let crudIcon;
-    let LikeIcon;
-    if (loggedUser != undefined) {
-
-    }
-    crudIcon =
-        `
-        <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
-        <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+    let crudIcon = " ";
+    let LikeIcon = " ";
+    let user = JSON.parse(sessionStorage.getItem("User"));
+    console.log(user);
+    if(user != null)
+    {
+        //$("#nbLikes").text(nblikes);
+        LikeIcon = `
+            <p class="fa-regular fa-thumbs-up likeCmd" postId="${post.Id}" ></p>
+            <p id="nbLikes-${post.Id}" class="nbLikes"></p>
         `;
-    if (loggedUser != undefined) {
-
+        if (user.isSuper) {
+            crudIcon =
+            `
+            <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
+            <span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>
+            `;
+        }
     }
-    LikeIcon =
-        `
-        <p class="fa-regular fa-thumbs-up"></p>
-        <p>0</p>
-        `;
     return $(`
         <div class="post" id="${post.Id}">
             <div class="postHeader">
@@ -352,14 +353,81 @@ function updateDropDownMenu() {
         updateDropDownMenu();
     });
 }
-function attach_Posts_UI_Events_Callback() {
+async function attach_Posts_UI_Events_Callback() {
 
     linefeeds_to_Html_br(".postText");
+
+        // Récupérer tous les likes et les appliquer correctement à chaque post
+        let likes = await users_API.getAllLike();
+        let user = JSON.parse(sessionStorage.getItem("User"));
+    
+        // Mettre à jour le nombre de likes et la classe pour chaque post
+        $(".post").each(function () {
+            let postId = $(this).attr("id");  // Assurez-vous que l'ID du post est bien attribué
+            let nblikes = likes.filter(like => like.idPost == postId).length;
+            $(`#nbLikes-${postId}`).text(nblikes);  // Mettre à jour le compteur de likes
+    
+            // Vérifier si l'utilisateur a déjà liké ce post
+            let likedByUser = likes.some(like => like.idPost == postId && like.UserName == user.Name);
+            
+            // Appliquer la bonne classe (fa-solid si l'utilisateur a liké, sinon fa-regular)
+            if (likedByUser) {
+                $(`.likeCmd[postId=${postId}]`).removeClass("fa-regular").addClass("fa-solid");
+            } else {
+                $(`.likeCmd[postId=${postId}]`).removeClass("fa-solid").addClass("fa-regular");
+            }
+    
+            // Afficher les noms des utilisateurs au survol du nombre de likes
+            $(`#nbLikes-${postId}`).on("mouseenter", function () {
+                let likedUsers = likes.filter(like => like.idPost == postId).map(like => like.UserName);
+                // Créer une chaîne de texte avec les noms des utilisateurs
+                let userList = likedUsers.join(', ');
+    
+                // Afficher les utilisateurs dans une info-bulle ou une boîte de texte
+                $(this).attr("title", `Liked by: ${userList}`);  // Utiliser l'attribut title pour afficher le tooltip
+            });
+    
+            $(`#nbLikes-${postId}`).on("mouseleave", function () {
+                $(this).removeAttr("title");  // Retirer le tooltip au départ de la souris
+            });
+        });
+
     // attach icon command click event callback
     $(".editCmd").off();
     $(".editCmd").on("click", function () {
         showEditPostForm($(this).attr("postId"));
     });
+    $(".likeCmd").off();
+    $(".likeCmd").on("click", async function () {
+        let user = JSON.parse(sessionStorage.getItem("User"));
+        let postId = $(this).attr("postId");
+        let data = {
+            idPost: postId,
+            UserName: user.Name
+        };
+    
+        // Ajout ou suppression du like
+        if ($(this).hasClass("fa-regular")) {
+            $(this).removeClass("fa-regular").addClass("fa-solid");
+            await users_API.Like(data);
+        } else {
+            $(this).removeClass("fa-solid").addClass("fa-regular");
+            let likes = await users_API.getAllLike();
+            for (let element of likes) {
+                if (element.idPost == postId && element.UserName == user.Name) {
+                    await users_API.Unlike(element.Id);
+                    break;
+                }
+            }
+        }
+    
+        // Récupérer et mettre à jour le nombre de likes pour ce post
+        let likes = await users_API.getAllLike();
+        let nblikes = likes.filter(element => element.idPost == postId).length;
+        $(`#nbLikes-${postId}`).text(nblikes); // Met à jour le compteur unique
+    });
+    
+
     $(".deleteCmd").off();
     $(".deleteCmd").on("click", function () {
         showDeletePostForm($(this).attr("postId"));
@@ -627,7 +695,8 @@ function renderLoginForm() {
                     await users_API.Logout(user.User.Id);
                     showConfirmLogin();
                 } else {
-                    sessionStorage.setItem("User", user);
+                    sessionStorage.setItem("token", user.Access_token);
+                    sessionStorage.setItem("User", JSON.stringify(user.User));
                     showPosts();
                 }
             } else {
@@ -684,7 +753,7 @@ function renderLoginConfirm() {
                 console.log(data);
                 let user = await users_API.Login(data);
                 sessionStorage.setItem("token", user.Access_token);
-                sessionStorage.setItem("UserId", user.User.Id);
+                sessionStorage.setItem("User", JSON.stringify(user.User));
                 showPosts();
             }
             else
