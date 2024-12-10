@@ -209,8 +209,8 @@ export default class AccountsController extends Controller {
     // GET:account/remove/id
     remove(id) { // warning! this is not an API endpoint 
         // todo make sure that the requester has legitimity to delete ethier itself or its an admin
-        //if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext.authorizations, this.requiredAuthorizations, id)) {
-            if (AccessControl.readGranted(this.HttpContext.authorizations, AccessControl.anonymous())){
+        //if () {
+            if (AccessControl.writeGrantedAdminOrOwner(this.HttpContext.authorizations, this.requiredAuthorizations, id)){
             if (this.HttpContext.path.id !== '') {
                 if (this.repository.remove(id))
                     this.HttpContext.response.accepted();

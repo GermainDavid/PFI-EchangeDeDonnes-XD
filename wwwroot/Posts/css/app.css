@@ -22,7 +22,17 @@
        supported by Chrome, Edge, Opera and Firefox */
     cursor: default;
 }
+.userProfileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0px;
+}
 
+.userName {
+    font-weight: bold;
+}
 body {
     background-color: black;
 }

@@ -180,6 +180,39 @@ class users_API {
             });
         });
     }
+    static async Modify(data) {
+        users_API.initHttpState();
+        let token = sessionStorage.getItem("token");
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/accounts/modify" ,
+                type: "PUT",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                headers: {
+                    "authorization": "Bearer " + token
+                },
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
+    static async Delete(id) {
+        users_API.initHttpState();
+        let token = sessionStorage.getItem("token");
+        return new Promise(resolve => {
+            $.ajax({
+                url: this.Host_URL() + "/accounts/remove/"+id ,
+                type: "GET",
+                contentType: 'text/plain',
+                headers: {
+                    "authorization": "Bearer " + token
+                },
+                success: (data) => { resolve(data); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+            });
+        });
+    }
     static async Remove(id) {
         return new Promise(resolve => {
             $.ajax({
