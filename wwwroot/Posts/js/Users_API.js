@@ -98,10 +98,9 @@ class users_API {
             $.ajax({
                 url: this.Host_URL() + "/accounts/verify?id="+id+"&code="+code,
                 type: "GET",
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: (data) => { resolve(data); },
-                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
+                contentType: 'text/plain',
+                success: () => { resolve(true); },
+                error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(false); }
             });
         });
     }

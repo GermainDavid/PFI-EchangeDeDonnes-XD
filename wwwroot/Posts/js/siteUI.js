@@ -603,46 +603,57 @@ function renderLoginForm() {
                 <hr/>
                 <input type="submit"value="Nouveau Compte" id="createAccount" class="btn btn-secondary newAccountBtn"/>
             </div>
+            <p id="errorMessage" style="color: red; display: none;"></p>
         </form>
     `));
     initFormValidation(); // important do to after all html injection!
     $('#createAccount').on("click", function () {
         renderCreateAccountForm();
     });
-    $('#commitLogin').on("click", async function () {
+    $('#commitLogin').on("click", async function (e) {
+        e.preventDefault();
         let loginInfo = getFormData($(".loginForm"));
         console.log(loginInfo);
-        
-        let user = await users_API.Login(loginInfo);
-
-        showConfirmLogin();
-        /*
-        if(user.User.VerifyCode != "verified")
-        {
-            
+        //periodic_Refresh_paused = false;
+        try {
+            let user = await users_API.Login(loginInfo);
+    
+            if (user != null) {
+                if (user.User.VerifyCode !== "verified") {
+                    //sessionStorage.setItem("tokenTempo", user.Access_token);
+                    sessionStorage.setItem("UserIdTempo", user.User.Id);
+                    sessionStorage.setItem("Email", loginInfo.Email);
+                    sessionStorage.setItem("Password", loginInfo.Password);
+                    await users_API.Logout(user.User.Id);
+                    showConfirmLogin();
+                } else {
+                    sessionStorage.setItem("User", user);
+                    showPosts();
+                }
+            } else {
+                //console.log(users_API.currentHttpError);
+                // Si `users_API.Login` retourne null, afficher un message d'erreur générique
+                $("#errorMessage").text(users_API.currentHttpError).show();
+            }
+        } catch (error) {
+            // Gérer l'erreur si elle est retournée par `users_API.Login`
+            console.log("Erreur détectée :", error);
+    
+            // Vérifiez si l'erreur contient des informations exploitables
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.message || "Une erreur inconnue s'est produite.";
+                showError(errorMessage);
+            } else {
+                showError("Impossible de traiter votre demande pour le moment.");
+            }
         }
-        else
-        {
-            //let user = await users_API.Login(loginInfo);
-        }
-            */
-        //await users_API.Logout(user.User.Id);
-        //renderLoginConfirm();
-        /*
-        console.log(user);
-        if(user != null)
-        {
-            //sessionStorage.setItem("userId", user.User.Id);
-            sessionStorage.setItem("Email",loginInfo.Email);
-            sessionStorage.setItem("Password",loginInfo.Password);
-        }
-        
-        console.log("Login") //Faire Procédure de Login Içi !!!
-        */
     });
 }
 function renderLoginConfirm() {
+    //console.log(test);
+    //periodic_Refresh_paused = false;
     //let user = await users_API.Login(loginInfo);
+        //await users_API.Logout(sessionStorage.getItem("UserTempo").User.Id);
         $("#viewTitle").text("Confirmation de compte");
         $("#form").show();
         $("#form").empty();
@@ -654,12 +665,32 @@ function renderLoginConfirm() {
             <div class="form-submit-section">
                 <input type="submit" value="Confirmation" id="confirmeLogin" class="btn btn-primary"/>
             </div>
+            <p id="errorMessage" style="color: red; display: none;"></p>
         </form>
         `));
-        $('#confirmeLogin').on("click", function () {
-            //let code = getFormData($(".ConfirmationForm"));
-            //let test = sessionStorage.getItem("userId");
-            //console.log(test);
+        initFormValidation();
+        $('#confirmeLogin').on("click",async function (e) {
+            e.preventDefault();
+            let code = getFormData($(".ConfirmationForm"));
+            let userId = sessionStorage.getItem("UserIdTempo");
+            console.log(userId);
+            let result = await users_API.ConfirmationUser(userId,code.Code);
+            if(result)
+            {
+                let data = {
+                    Email :sessionStorage.getItem("Email"),
+                    Password : sessionStorage.getItem("Password")
+                }
+                console.log(data);
+                let user = await users_API.Login(data);
+                sessionStorage.setItem("token", user.Access_token);
+                sessionStorage.setItem("UserId", user.User.Id);
+                showPosts();
+            }
+            else
+            {
+                $("#errorMessage").text("Le code et le courriel ne corresponde pas!").show();
+            }
         });
 }
 function renderCreateAccountForm() {
@@ -748,7 +779,7 @@ function renderCreateAccountForm() {
         }
         let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
         if (response != null) {
-            alert("Compte créé avec succès !");
+            //alert("Compte créé avec succès !");
             renderLoginForm(); // Redirection vers le formulaire de connexion
         }
         else {
