@@ -390,3 +390,11 @@ label {
     margin: 0 auto; /* Centrage horizontal */
     width: 100%; /* Pour occuper toute la largeur */
 }
+.UserInfoPosts {
+    display: grid;
+    grid-template-columns: 30px,30px,auto;
+}
+.userName {
+    font-size: 16px; /* Taille de la police pour le nom (modifiable) */
+    font-weight: bold;
+}

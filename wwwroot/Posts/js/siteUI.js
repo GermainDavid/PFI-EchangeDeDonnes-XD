@@ -108,6 +108,18 @@ function intialView() {
 }
 async function showPosts(reset = false) {
     intialView();
+    let user = JSON.parse(sessionStorage.getItem("User"));
+    if(user != null)
+    {
+        if(user.isSuper || user.isAdmin)
+        {
+            $('#createPost').show();
+        }
+    }
+    else
+    {
+        $('#createPost').hide();
+    }
     $("#viewTitle").text("Fil de nouvelles");
     periodic_Refresh_paused = false;
     await postsPanel.show(reset);
@@ -256,7 +268,7 @@ function renderPost(post, loggedUser) {
             <p class="fa-regular fa-thumbs-up likeCmd" postId="${post.Id}" ></p>
             <p id="nbLikes-${post.Id}" class="nbLikes"></p>
         `;
-        if (user.isSuper) {
+        if (user.isSuper || user.isAdmin) {
             crudIcon =
             `
             <span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>
@@ -273,7 +285,12 @@ function renderPost(post, loggedUser) {
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
-            <div class="postDate"> ${date} </div>
+            <div class"UserInfoPosts">
+                <img class="userProfileImage" src='${post.UserAvatar}'/>
+                <div class="userName">${post.UserName}</div>
+                <div class="postDate"> ${date} </div>
+            </div>
+            
             <div postId="${post.Id}" class="postTextContainer hideExtra">
                 <div class="postText" >${post.Text}</div>
             </div>
@@ -697,6 +714,13 @@ function renderPostForm(post = null) {
             selectedCategory = "";
         if (create || !('keepDate' in post))
             post.Date = Local_to_UTC(Date.now());
+        if(create){
+            let user = JSON.parse(sessionStorage.getItem("User"));
+            //let avatar = user.Avatar.replace("http://localhost:5000/assetsRepository/","User");
+            post.UserAvatar = user.Avatar;
+            post.UserId = user.Id;
+            post.UserName = user.Name;
+        }
         delete post.keepDate;
         post = await Posts_API.Save(post, create);
         if (!Posts_API.error) {
@@ -945,9 +969,25 @@ function renderConfirmDelete(id){
         `));
         $('#delUser').on("click", async function () {
             let user = JSON.parse(sessionStorage.getItem("User"));
+            let posts = await Posts_API.Get();
+            //console.log(posts.data);
+            let likes = await users_API.getAllLike();
+            likes.forEach(elem => {
+                	if(elem.idUser == user.Id)
+                    {
+                        users_API.Unlike(elem.Id);
+                    }
+            });
+            posts.data.forEach(element => {
+                if(element.UserId==user.Id)
+                {
+                    Posts_API.Delete(element.Id);
+                }
+            });
             await users_API.Delete(user.Id);
             sessionStorage.removeItem("User");
             sessionStorage.removeItem("token");
+            showLogin();
         });
         $('#cancel').on("click", function () {
             showEditUser();
@@ -1124,6 +1164,21 @@ async function renderConfirmationDelete(id) {
         </form>
     `));
     $('#deleteCmd').on("click", async function () {
+        let posts = await Posts_API.Get();
+            //console.log(posts.data);
+            let likes = await users_API.getAllLike();
+            likes.forEach(elem => {
+                	if(elem.idUser == user.Id)
+                    {
+                        users_API.Unlike(elem.Id);
+                    }
+            });
+            posts.data.forEach(element => {
+                if(element.UserId==user.Id)
+                {
+                    Posts_API.Delete(element.Id);
+                }
+            });
         await users_API.Remove(id);
         renderUserManager();
     });

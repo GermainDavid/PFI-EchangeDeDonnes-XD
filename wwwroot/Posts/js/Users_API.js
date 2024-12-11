@@ -28,11 +28,15 @@ class users_API {
         });
     }
     static async Get(id = null) {
+        let token = sessionStorage.getItem("token");
         console.log(id);
         users_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({
                 url: this.Host_URL() + "/accounts/" + (id != null ? "/" + id : ""),
+                headers: {
+                    "authorization": "Bearer " + token
+                },
                 complete: data => { resolve({ ETag: data.getResponseHeader('ETag'), data: data.responseJSON }); },
                 error: (xhr) => { users_API.setHttpErrorState(xhr); resolve(null); }
             });
@@ -214,10 +218,14 @@ class users_API {
         });
     }
     static async Remove(id) {
+        let token = sessionStorage.getItem("token");
         return new Promise(resolve => {
             $.ajax({
                 url: this.Host_URL() + "/accounts/remove/" + id,
                 type: "GET",
+                headers: {
+                    "authorization": "Bearer " + token
+                },
                 complete: () => {
                     users_API.initHttpState();
                     resolve(true);
