@@ -285,7 +285,7 @@ function renderPost(post, loggedUser) {
             </div>
             <div class="postTitle"> ${post.Title} </div>
             <img class="postImage" src='${post.Image}'/>
-            <div class"UserInfoPosts">
+            <div class="UserInfoPosts">
                 <img class="userProfileImage" src='${post.UserAvatar}'/>
                 <div class="userName">${post.UserName}</div>
                 <div class="postDate"> ${date} </div>
@@ -332,20 +332,17 @@ function updateDropDownMenu() {
                 <span class="userName">${user.Name}</span>
             </div>
         `));
+    }
+    if(user != null && user != undefined && user.isAdmin){
         DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="userEditCmd">
-                <i class="menuIcon fa-solid fa-user-pen"></i> Modifier votre profil
+            <div class="dropdown-item menuItemLayout" id="userManagerCmd">
+                <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion d'usagers
             </div>
         `));
+        DDMenu.append($(`
+            <div class="dropdown-divider"></div>
+        `));
     }
-    DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout" id="userManagerCmd">
-            <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion d'usagers
-        </div>
-    `));
-    DDMenu.append($(`
-        <div class="dropdown-divider"></div>
-    `));
     user = JSON.parse(sessionStorage.getItem("User"));
     if(user == null || user == undefined)
     {
@@ -357,6 +354,11 @@ function updateDropDownMenu() {
     }
     else
     {
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout" id="userEditCmd">
+                <i class="menuIcon fa fa-user-pen mx-2"></i> Modifier votre profil
+            </div>
+        `));
         DDMenu.append($(`
             <div class="dropdown-item menuItemLayout" id="logoutCmd">
                 <i class="menuIcon fa fa-right-to-bracket mx-2"></i> Se Déconnecter
@@ -1093,32 +1095,35 @@ async function renderUserManager() {
     $("#form").show();
     $("#form").empty();
     //Html et User
+    let connectedUser = JSON.parse(sessionStorage.getItem("User"));
     let users = await users_API.Get();
     console.log(users);
     let usersHtml = "";
     users.data.forEach(user => {
-        //Niveau d'autorisations
-        let autorization = "promoteCmd fa-solid fa-user";
-        if (user.isAdmin) {
-            autorization = "promoteCmd fa-solid fa-user-tie"
+        if(user.Id != connectedUser.Id){
+            //Niveau d'autorisations
+            let autorization = "promoteCmd fa-solid fa-user";
+            if (user.isAdmin) {
+                autorization = "promoteCmd fa-solid fa-user-tie"
+            }
+            else if (user.isSuper) {
+                autorization = "promoteCmd fa-solid fa-user-gear"
+            }
+            //Bloqué ?
+            let blocked = "";
+            if(user.isBlocked){
+                blocked = "color : red";
+            }
+            usersHtml += `
+                <div class="userManagerRow" userId="${user.Id}">
+                    <img src="${user.Avatar}" />
+                    <span>${user.Name}</span>
+                    <i class="${autorization}"></i>
+                    <i class="blockCmd fa-solid fa-ban" style="${blocked}"></i>
+                    <i class="eraseCmd fa-solid fa-trash"></i>
+                </div>
+            `;
         }
-        else if (user.isSuper) {
-            autorization = "promoteCmd fa-solid fa-user-gear"
-        }
-        //Bloqué ?
-        let blocked = "";
-        if(user.isBlocked){
-            blocked = "color : red";
-        }
-        usersHtml += `
-            <div class="userManagerRow" userId="${user.Id}">
-                <img src="${user.Avatar}" />
-                <span>${user.Name}</span>
-                <i class="${autorization}"></i>
-                <i class="blockCmd fa-solid fa-ban" style="${blocked}"></i>
-                <i class="eraseCmd fa-solid fa-trash"></i>
-            </div>
-        `;
     })
     //Peuplement de la page
     $("#form").append($(` 

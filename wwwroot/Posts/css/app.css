@@ -391,8 +391,10 @@ label {
     width: 100%; /* Pour occuper toute la largeur */
 }
 .UserInfoPosts {
-    display: grid;
-    grid-template-columns: 30px,30px,auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
 }
 .userName {
     font-size: 16px; /* Taille de la police pour le nom (modifiable) */
