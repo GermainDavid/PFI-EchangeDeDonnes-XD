@@ -35,14 +35,14 @@ export default class AccountsController extends Controller {
                         let newToken = TokenManager.create(user);
                         this.HttpContext.response.created(newToken);
                     } else {
-                        this.HttpContext.response.wrongPassword("Wrong password.");
+                        this.HttpContext.response.wrongPassword("Mot de passe incorrect.");
                     }
                 } else
-                    this.HttpContext.response.userNotFound("This user email is not found.");
+                    this.HttpContext.response.userNotFound("L'email fournis ne fais pas partie de notre base de données très complexe.");
             } else
                 this.HttpContext.response.notImplemented();
         } else
-            this.HttpContext.response.badRequest("Credential Email and password are missing.");
+            this.HttpContext.response.badRequest("Veuillez remplir le email et le mot de passe.");
     }
     logout() {
         let userId = this.HttpContext.path.params.userId;

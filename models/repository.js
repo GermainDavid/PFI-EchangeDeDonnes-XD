@@ -99,7 +99,7 @@ export default class Repository {
         if (this.model.key)
             conflict = this.findByField(this.model.key, instance[this.model.key], instance.Id) != null;
         if (conflict) {
-            this.model.addError(`Unicity conflict on [${this.model.key}]...`);
+            this.model.addError(`Le champ ${this.model.key} est déjà utiliser dans la base de donnée, veuillez le changer`);
             this.model.state.inConflict = true;
         }
         return conflict;

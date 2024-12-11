@@ -337,12 +337,15 @@ function updateDropDownMenu() {
                 <i class="menuIcon fa-solid fa-user-pen"></i> Modifier votre profil
             </div>
         `));
+        if(user.isAdmin)
+        {
+            DDMenu.append($(`
+                <div class="dropdown-item menuItemLayout" id="userManagerCmd">
+                    <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion d'usagers
+                </div>
+            `));
+        }
     }
-    DDMenu.append($(`
-        <div class="dropdown-item menuItemLayout" id="userManagerCmd">
-            <i class="menuIcon fa fa-user-gear mx-2"></i> Gestion d'usagers
-        </div>
-    `));
     DDMenu.append($(`
         <div class="dropdown-divider"></div>
     `));
@@ -716,10 +719,7 @@ function renderPostForm(post = null) {
             post.Date = Local_to_UTC(Date.now());
         if(create){
             let user = JSON.parse(sessionStorage.getItem("User"));
-            //let avatar = user.Avatar.replace("http://localhost:5000/assetsRepository/","User");
-            post.UserAvatar = user.Avatar;
             post.UserId = user.Id;
-            post.UserName = user.Name;
         }
         delete post.keepDate;
         post = await Posts_API.Save(post, create);
@@ -896,7 +896,7 @@ function renderCreateAccountForm() {
 
     // Initialisation des fonctionnalités
     initFormValidation(); // Validation regex et comportement
-    //addConflictValidation('/api/check-email', 'Email', 'commitUser'); // Validation d'unicité des emails
+    //addConflictValidation('/accounts/conflict', 'Email', 'commitUser'); // Validation d'unicité des emails
     initImageUploaders(); // Gestion de l'upload d'avatar
 
     // Gestion du bouton "Annuler"
@@ -934,13 +934,23 @@ function renderCreateAccountForm() {
             Email: email,
             Avatar: post.Image
         };
+        if(email == undefined || email == null || email == "")
+        {
+            $("#errorMessage").text("Email obligatoire!").show();
+            return;
+        }
+        if(password == undefined || password == null || password == "")
+        {
+            $("#errorMessage").text("Mot de passe obligatoire!").show();
+            return;
+        }
         if (name == undefined || name == null || name == " " || name == "") {
-            $("#errorMessage").text("Nom obligatoire").show();
+            $("#errorMessage").text("Nom obligatoire!").show();
             return;
         }
         if(post.Image == undefined || post.Image == null || post.Image == " " || post.Image == " ")
         {
-            $("#errorMessage").text("Photo de profil obligatoire").show();
+            $("#errorMessage").text("Photo de profil obligatoire!").show();
             return;
         }
         let response = await users_API.Register(userObject); // Enregistrement de l'utilisateur
