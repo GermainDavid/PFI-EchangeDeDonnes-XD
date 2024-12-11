@@ -53,6 +53,11 @@ function startCountdown() {
                 if (timeLeft <= -timeBeforeRedirect) {
                     clearTimeout(currentTimeouID);
                     closePopup();
+                    sessionStorage.setItem("messageCode", "Votre session est expirée. Veuillez vous reconnecter.");
+                    let user = JSON.parse(sessionStorage.getItem("User"));
+                    sessionStorage.removeItem("User");
+                    sessionStorage.removeItem("token");
+                    users_API.Logout(user.Id);
                     timeoutCallBack();
                 }
             }

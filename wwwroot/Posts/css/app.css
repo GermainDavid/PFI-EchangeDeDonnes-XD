@@ -383,3 +383,10 @@ label {
     background-color: rgb(155, 5, 35);
     border-color: rgb(155, 5, 35);
 }
+#message {
+    color: red; /* Texte rouge */
+    text-align: center; /* Alignement horizontal */
+    font-size: 20px; /* Taille du texte (modifiable) */
+    margin: 0 auto; /* Centrage horizontal */
+    width: 100%; /* Pour occuper toute la largeur */
+}

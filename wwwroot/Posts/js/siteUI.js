@@ -18,6 +18,7 @@ let waiting = null;
 let showKeywords = false;
 let keywordsOnchangeTimger = null;
 sessionStorage.setItem("messageCode", " ");
+initTimeout(15,() => showLogin());
 Init_UI();
 async function Init_UI() {
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
@@ -211,6 +212,7 @@ function start_Periodic_Refresh() {
         periodicRefreshPeriod * 1000);
 }
 async function renderPosts(queryString) {
+    timeout(120);
     let endOfData = false;
     queryString += "&sort=date,desc";
     compileCategories();
@@ -561,6 +563,7 @@ function highlightKeywords() {
 //////////////////////// Forms rendering /////////////////////////////////////////////////////////////////
 
 async function renderEditPostForm(id) {
+    noTimeout();
     $('#commit').show();
     addWaitingGif();
     let response = await Posts_API.Get(id)
@@ -576,6 +579,7 @@ async function renderEditPostForm(id) {
     removeWaitingGif();
 }
 async function renderDeletePostForm(id) {
+    timeout(60);
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {
         let post = response.data;
@@ -623,6 +627,7 @@ function newPost() {
     return Post;
 }
 function renderPostForm(post = null) {
+    noTimeout();
     let create = post == null;
     if (create) post = newPost();
     $("#form").show();
@@ -706,15 +711,16 @@ function renderPostForm(post = null) {
     });
 }
 function renderLoginForm() {
+    noTimeout();
     $("#viewTitle").text("Connexion");
     $("#form").show();
     $("#form").empty();
     $("#form").append($(`
         <form class="loginForm">
-            <p>${sessionStorage.getItem("messageCode")}</p>
+            <p id="message">${sessionStorage.getItem("messageCode")}</p>
             <div class="form-section">
                 <input type="text" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
-                <input type="text" id="Password" placeholder="Mot de Passe" name="Password" required RequireMessage="Veuillez entrer le mot de passe" class="textInput"/>
+                <input type="password" id="Password" placeholder="Mot de Passe" name="Password" required RequireMessage="Veuillez entrer le mot de passe" class="textInput"/>
             </div>
             <div class="form-submit-section">
                 <input type="submit" value="Entrer" id="commitLogin" class="btn btn-primary"/>
@@ -746,10 +752,12 @@ function renderLoginForm() {
                         sessionStorage.setItem("Email", loginInfo.Email);
                         sessionStorage.setItem("Password", loginInfo.Password);
                         await users_API.Logout(user.User.Id);
+                        timeout(120);
                         showConfirmLogin();
                     } else {
                         sessionStorage.setItem("token", user.Access_token);
                         sessionStorage.setItem("User", JSON.stringify(user.User));
+                        timeout(120);
                         showPosts();
                     }
                 }
@@ -812,6 +820,7 @@ function renderLoginConfirm() {
                 let user = await users_API.Login(data);
                 sessionStorage.setItem("token", user.Access_token);
                 sessionStorage.setItem("User", JSON.stringify(user.User));
+                timeout(300);
                 showPosts();
             }
             else
@@ -821,6 +830,7 @@ function renderLoginConfirm() {
         });
 }
 function renderCreateAccountForm() {
+    noTimeout();
     $("#viewTitle").text("Créer un Compte");
     $("#form").show().empty();
 
@@ -829,13 +839,13 @@ function renderCreateAccountForm() {
         <form class="createAccountForm">
             <div class="form-section">
                 <span>Adresse Courriel</span>
-                <input type="text" class="Email" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
-                <input type="text" class="Email MatchedInput" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required matchedInputId="Email" RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
+                <input type="text" class="Email textInput" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel"/>
+                <input type="text" class="Email textInput" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required matchedInputId="Email" RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Mot de Passe</span>
                 <input type="password" id="Password" placeholder="Mot de passe" name="Password" required RequireMessage="Veuillez entrer un mot de passe" class="textInput"/>
-                <input type="password" class="MatchedInput" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required matchedInputId="Password" RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
+                <input type="password" class="textInput" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required matchedInputId="Password" RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Nom</span>
@@ -921,6 +931,7 @@ function renderCreateAccountForm() {
     });
 }
 function renderConfirmDelete(id){
+    timeout(60);
     $("#viewTitle").text("Confirmation de compte");
         $("#form").show();
         $("#form").empty();
@@ -943,6 +954,7 @@ function renderConfirmDelete(id){
         });
 }
 function renderEditAccountForm() {
+    noTimeout();
     $("#viewTitle").text("Créer un Compte");
     $("#form").show().empty();
     let user = JSON.parse(sessionStorage.getItem("User"));
@@ -951,13 +963,13 @@ function renderEditAccountForm() {
         <form class="createAccountForm">
             <div class="form-section">
                 <span>Adresse Courriel</span>
-                <input type="text" value="${user.Email}" class="Email" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
-                <input type="text" value="${user.Email}" class="Email MatchedInput" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required matchedInputId="Email" RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
+                <input type="text" value="${user.Email}" class="Email textInput" id="Email" placeholder="Courriel" name="Email" required RequireMessage="Veuillez entrer un courriel" class="textInput"/>
+                <input type="text" value="${user.Email}" class="Email textInput" id="EmailVerification" placeholder="Vérification" name="EmailVerification" required matchedInputId="Email" RequireMessage="Veuillez confirmer le courriel" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Mot de Passe (optionel)</span>
                 <input type="password" id="Password" placeholder="Mot de passe" name="Password" required RequireMessage="Veuillez entrer un mot de passe" class="textInput"/>
-                <input type="password" class="MatchedInput" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required matchedInputId="Password" RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
+                <input type="password" class="textInput" id="PasswordVerification" placeholder="Vérification" name="PasswordVerification" required matchedInputId="Password" RequireMessage="Veuillez confirmer le mot de passe" class="textInput"/>
             </div>
             <div class="form-section">
                 <span>Nom</span>
@@ -1035,6 +1047,7 @@ function renderEditAccountForm() {
     });
 }
 async function renderUserManager() {
+    noTimeout();
     $("#viewTitle").text("Gestion d'usagers");
     $("#commit").hide();
     $("#form").show();
@@ -1092,6 +1105,7 @@ async function renderUserManager() {
     });
 }
 async function renderConfirmationDelete(id) {
+    timeout(60);
     let user = await users_API.Get(id);
     console.log(user);
     $("#form").empty();
