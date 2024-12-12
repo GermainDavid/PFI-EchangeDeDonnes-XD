@@ -70,6 +70,8 @@ class users_API {
     }
     static async Like(data){
         users_API.initHttpState();
+        let token = sessionStorage.getItem("token");
+        let user = JSON.parse(sessionStorage.getItem("User"));
         return new Promise(resolve => {
             $.ajax({
                 url: this.Host_URL() + "/api/likes" ,

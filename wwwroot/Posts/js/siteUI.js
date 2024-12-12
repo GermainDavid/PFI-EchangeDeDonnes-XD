@@ -335,11 +335,6 @@ function updateDropDownMenu() {
                 <span class="userName">${user.Name}</span>
             </div>
         `));
-        DDMenu.append($(`
-            <div class="dropdown-item menuItemLayout" id="userEditCmd">
-                <i class="menuIcon fa-solid fa-user-pen"></i> Modifier votre profil
-            </div>
-        `));
         if(user.isAdmin)
         {
             DDMenu.append($(`
@@ -1090,14 +1085,30 @@ function renderEditAccountForm() {
         console.log(userObject);
         let response = await users_API.Modify(userObject); // Enregistrement de l'utilisateur
         if (response != null) {
-            await users_API.Logout(user.Id);
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("User");
-            if(user.Email != email)
-            {
-                sessionStorage.setItem("messageCode", "Votre compte à été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification qui vous sera demandé lors de votre prochaine connexion.");
+            if((password != "")) {
+                sessionStorage.setItem(
+                    "messageCode", 
+                    "Votre mot de passe à été modifier, veuillez vous reconnecter."
+                );
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("User");
+                await users_API.Logout(user.Id);
+                showLogin();
+                return;
             }
-            renderLoginForm(); // Redirection vers le formulaire de connexion
+            if (user.Email != email) {
+                    sessionStorage.setItem(
+                        "messageCode", 
+                        "Votre email a été modifié. Veuillez consulter vos courriels pour récupérer votre code de vérification, qui vous sera demandé lors de votre prochaine connexion."
+                    );
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("User");
+                await users_API.Logout(user.Id);
+                showLogin();
+                return;
+            }
+            sessionStorage.setItem("User", JSON.stringify(response));
+            showPosts();
         }
         else {
             $("#errorMessage").text(users_API.currentHttpError).show();
