@@ -115,6 +115,9 @@ async function showPosts(reset = false) {
         {
             $('#createPost').show();
         }
+        else{
+            $('#createPost').hide();
+        }
     }
     else
     {
